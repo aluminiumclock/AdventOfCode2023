@@ -8,6 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Day04 Part1\**" />
+    <Compile Remove="Day04 Part2\**" />
+    <Compile Remove="Day_04_01\**" />
+    <EmbeddedResource Remove="Day04 Part1\**" />
+    <EmbeddedResource Remove="Day04 Part2\**" />
+    <EmbeddedResource Remove="Day_04_01\**" />
+    <None Remove="Day04 Part1\**" />
+    <None Remove="Day04 Part2\**" />
+    <None Remove="Day_04_01\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="zDay01\CalibrationDocument.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
