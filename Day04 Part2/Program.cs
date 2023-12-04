@@ -3,9 +3,9 @@
 string inputFile;
 
 #if DEBUG
-inputFile = "text.txt";
+    inputFile = "test.txt";
 #else
-inputFile = "input.txt";
+    inputFile = "input.txt";
 #endif
 
 int result = 0;

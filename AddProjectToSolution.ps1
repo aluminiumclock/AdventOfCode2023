@@ -1,0 +1,1 @@
+﻿Get-ChildItem -Recurse -Include *.csproj | Where-Object {$_.Name -NotLike "Day01 Part1.csproj"} | ForEach-Object { dotnet sln add $_ }
