@@ -11,13 +11,13 @@ string[] input = File.ReadAllLines(inputFile);
 
 //Setup Maps
 string CurrentMap = ""; 
-AlmanacMap SeedToSoil = new AlmanacMap();
-AlmanacMap SoilToFertilizer = new AlmanacMap();
-AlmanacMap FertilizerToWater = new AlmanacMap();
-AlmanacMap WaterToLight = new AlmanacMap();
-AlmanacMap LightToTemperature = new AlmanacMap();
-AlmanacMap TemperatureToHumidty = new AlmanacMap();
-AlmanacMap HumidtyToLocation = new AlmanacMap();
+AlmanacMap SeedToSoil = new();
+AlmanacMap SoilToFertilizer = new();
+AlmanacMap FertilizerToWater = new();
+AlmanacMap WaterToLight = new();
+AlmanacMap LightToTemperature = new();
+AlmanacMap TemperatureToHumidty = new();
+AlmanacMap HumidtyToLocation = new();
 
 List<AlmanacMap> AllMaps = new()
 {
@@ -59,7 +59,7 @@ Int64 minLocation = Int64.MaxValue;
 
 foreach (Int64 seed in seeds)
 {
-    Int64 location =  MapThroughAllMaps(seed);
+    Int64 location =  NavigateThroughAllMaps(seed);
     if(location < minLocation)
     {
         minLocation = location;
@@ -77,12 +77,11 @@ void AddToMap(string line, string currentMap)
     AlmanacMap selectedMap = SelectMap(currentMap);
     
     string[] data = line.Split(' ',StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    Int64 startingValue = Int64.Parse(data[0]);
+    Int64 startingKey = Int64.Parse(data[1]);
+    Int64 count = Int64.Parse(data[2]);
 
-    Int64 StartingValue = Int64.Parse(data[0]);
-    Int64 StartingKey = Int64.Parse(data[1]);
-    Int64 Count = Int64.Parse(data[2]);
-
-    selectedMap.mapRanges.Add(new MapRange { StartingKey = StartingKey, StartingValue = StartingValue, Count = Count });
+    selectedMap.mapRanges.Add(new MapRange { StartingKey = startingKey, StartingValue = startingValue, Count = count });
 }
 
 AlmanacMap SelectMap(string currentMap) => currentMap switch
@@ -97,7 +96,7 @@ AlmanacMap SelectMap(string currentMap) => currentMap switch
     _ => throw new ArgumentOutOfRangeException(nameof(currentMap), $"Not an known map: {currentMap}")
 };
 
-Int64 MapThroughAllMaps(Int64 seed)
+Int64 NavigateThroughAllMaps(Int64 seed)
 {
     foreach(AlmanacMap map in AllMaps)
     {
