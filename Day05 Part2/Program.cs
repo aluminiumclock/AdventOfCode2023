@@ -66,6 +66,7 @@ Int64 minLocation = Int64.MaxValue;
 
 foreach (SeedRange seedRange in seeds)
 {
+    Console.WriteLine($"StartingSeed: {seedRange.StartingSeed} For:{seedRange.Count}"); 
     Int64 location = MinLocationViaMaps(seedRange);
     if (location < minLocation)
     {
