@@ -30,9 +30,9 @@ for (int i = 1; i <= 9; i++)
 foreach (string line in input)
 {
     int firstNumber = 0;
-    int firstIndex = line.Length + 1;
+    int firstIndex = Int32.MaxValue;
     int lastNumber = 0;
-    int lastIndex = -1;
+    int lastIndex = Int32.MinValue;
 
     foreach (var digit in stringDigits)
     {
