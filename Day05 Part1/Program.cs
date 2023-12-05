@@ -6,20 +6,20 @@
     inputFile = "input.txt";
 #endif
 
-int result = 0;
+Int64 result = 0;
 string[] input = File.ReadAllLines(inputFile);
 
 //Setup Maps
 string CurrentMap = ""; 
-Dictionary<int, int> SeedToSoil = new Dictionary<int, int>();
-Dictionary<int, int> SoilToFertilizer = new Dictionary<int, int>();
-Dictionary<int, int> FertilizerToWater = new Dictionary<int, int>();
-Dictionary<int, int> WaterToLight = new Dictionary<int, int>();
-Dictionary<int, int> LightToTemperature = new Dictionary<int, int>();
-Dictionary<int, int> TemperatureToHumidty = new Dictionary<int, int>();
-Dictionary<int, int> HumidtyToLocation = new Dictionary<int, int>();
+AlmanacMap SeedToSoil = new AlmanacMap();
+AlmanacMap SoilToFertilizer = new AlmanacMap();
+AlmanacMap FertilizerToWater = new AlmanacMap();
+AlmanacMap WaterToLight = new AlmanacMap();
+AlmanacMap LightToTemperature = new AlmanacMap();
+AlmanacMap TemperatureToHumidty = new AlmanacMap();
+AlmanacMap HumidtyToLocation = new AlmanacMap();
 
-List<Dictionary<int, int>> AllMaps = new()
+List<AlmanacMap> AllMaps = new()
 {
     SeedToSoil,
     SoilToFertilizer,
@@ -32,10 +32,10 @@ List<Dictionary<int, int>> AllMaps = new()
 
 //Read Seeds
 string[] seedsText = input[0].Substring(7).Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-int[] seeds = Array.ConvertAll(seedsText,s => int.Parse(s));
+Int64[] seeds = Array.ConvertAll(seedsText,s => Int64.Parse(s));
 
 //Read Dictionaries
-for (int i = 1; i < input.Length; i++)
+for (Int64 i = 1; i < input.Length; i++)
 {
     string line = input[i];
 
@@ -55,11 +55,11 @@ for (int i = 1; i < input.Length; i++)
 }
 
 //Find min location
-int minLocation = int.MaxValue;
+Int64 minLocation = Int64.MaxValue;
 
-foreach (int seed in seeds)
+foreach (Int64 seed in seeds)
 {
-    int location =  MapThroughAllMaps(seed);
+    Int64 location =  MapThroughAllMaps(seed);
     if(location < minLocation)
     {
         minLocation = location;
@@ -74,20 +74,18 @@ Console.ReadLine();
 
 void AddToMap(string line, string currentMap)
 {
-    Dictionary<int, int> selectedMap = SelectMap(currentMap);
+    AlmanacMap selectedMap = SelectMap(currentMap);
     
     string[] data = line.Split(' ',StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-    int StartingValue = int.Parse(data[0]);
-    int StartingKey = int.Parse(data[1]);
-    int count = int.Parse(data[2]);
 
-    for (int i = 0; i < count; i++)
-    {
-        selectedMap.Add(StartingKey + i, StartingValue + i);
-    }
+    Int64 StartingValue = Int64.Parse(data[0]);
+    Int64 StartingKey = Int64.Parse(data[1]);
+    Int64 Count = Int64.Parse(data[2]);
+
+    selectedMap.mapRanges.Add(new MapRange { StartingKey = StartingKey, StartingValue = StartingValue, Count = Count });
 }
 
-Dictionary<int, int> SelectMap(string currentMap) => currentMap switch
+AlmanacMap SelectMap(string currentMap) => currentMap switch
 {
     "seed-to-soil map:" => SeedToSoil,
     "soil-to-fertilizer map:" => SoilToFertilizer,
@@ -99,15 +97,54 @@ Dictionary<int, int> SelectMap(string currentMap) => currentMap switch
     _ => throw new ArgumentOutOfRangeException(nameof(currentMap), $"Not an known map: {currentMap}")
 };
 
-int MapThroughAllMaps(int seed)
+Int64 MapThroughAllMaps(Int64 seed)
 {
-    foreach(Dictionary<int,int> map in AllMaps)
+    foreach(AlmanacMap map in AllMaps)
     {
-        if (map.ContainsKey(seed))
-        {
-            seed = map[seed];
-        }
+        seed = map.Navigate(seed);
     }
 
     return seed;
+}
+
+class AlmanacMap
+{
+    public List<MapRange> mapRanges = new();
+
+    public Int64 Navigate(Int64 seed)
+    {
+        foreach(MapRange mapRange in mapRanges)
+        {
+            Int64 rangeResult = mapRange.Navigate(seed);
+
+            if(rangeResult != -1) {
+                return rangeResult;
+            }
+        }
+
+        return seed;
+    }
+}
+
+class MapRange
+{
+    public Int64 StartingKey;
+    public Int64 StartingValue;
+    public Int64 Count;
+
+    public Int64 Navigate(Int64 seed)
+    {
+        if (seed < StartingKey)
+        {
+            return -1;
+        }
+
+        Int64 difference = seed - StartingKey;
+        if (difference < Count)
+        {
+            return StartingValue + difference;
+        }
+
+        return -1;
+    }
 }
