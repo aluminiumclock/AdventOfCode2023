@@ -13,11 +13,11 @@ for (int i = 0; i < lines.Length; i++)
 {
     for (int j = 0; j < lines[i].Length; j++)
     {
-        bool add = false;
-        int numbersByGear = 0;
-        int fullNumber = 1;
         if (lines[i][j] == '*')
         {
+            int numbersByGear = 0;
+            int fullNumber = 1;
+
             if (i > 0)
             {
                 LineTotal lt = NearbyNumbers(lines[i - 1], j);
@@ -36,14 +36,12 @@ for (int i = 0; i < lines.Length; i++)
                 fullNumber *= lt.totalOnLine;
                 numbersByGear += lt.numbersAdjGearOnLine;
             }
-        }
 
-        add = numbersByGear > 1;
+            if (numbersByGear > 1)
+            {
+                result += fullNumber;
 
-        if (add)
-        {
-            result += fullNumber;
-
+            }
         }
     }
 }
