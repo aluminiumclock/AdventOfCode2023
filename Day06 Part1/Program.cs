@@ -20,6 +20,8 @@ Console.WriteLine($"Result: {result}");
 Console.ReadLine();
 
 
+
+
 class Race
 {
     public int Time { get; set; }
@@ -38,12 +40,26 @@ class Race
     public int NumberOfWaysToWin()
     {
 
-        //set better mins and max here.
-        int waysToWin = 0;
-        for(int hold = 1; hold < Time; hold++)
-        {
-            if(((Time - hold) * hold) > Distance) { waysToWin++; }
-        }
-        return waysToWin;
+        List<double> quadAnswers = new();
+        quadAnswers.Add(QuadracticMinus(1, -1 * Time, Distance));
+        quadAnswers.Add(QuadracticPlus(1, -1 * Time, Distance));
+
+        //min solution is one above the quadratic formulas min solution
+        int minSolution = (int)quadAnswers.Min() + 1;
+        //max solution is int below the quadratic formula max solution (ignore the current int if it's has no decimals)
+        int maxSolution = (int)Math.Ceiling(quadAnswers.Max()) - 1;
+
+        int result = maxSolution - minSolution + 1; ;
+        return result;
+    }
+
+    private double QuadracticMinus(int a, int b, int c)
+    {
+        return ((-1 * b) - Math.Sqrt((b * b) - (4 * a * c))) / (2 * a);
+    }
+
+    private double QuadracticPlus(int a, int b, int c)
+    {
+        return ((-1 * b) + Math.Sqrt((b * b) - (4 * a * c))) / (2 * a);
     }
 }
