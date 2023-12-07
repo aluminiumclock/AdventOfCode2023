@@ -3,12 +3,11 @@ using System.Runtime.InteropServices;
 
 string inputFile;
 
-//#if DEBUG
-//    inputFile = "test.txt";
-//#else
-//    inputFile = "input.txt";
-//#endif
-inputFile = "input.txt";
+#if DEBUG
+    inputFile = "test.txt";
+#else
+    inputFile = "input.txt";
+#endif
 
 int result = 0;
 string[] input = File.ReadAllLines(inputFile);
