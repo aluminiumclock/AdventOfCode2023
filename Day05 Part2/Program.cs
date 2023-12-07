@@ -31,14 +31,14 @@ List<AlmanacMap> AllMaps = new()
 };
 
 //Read Seeds
-List<SeedRange> seeds = new();
+List<NumberRange> seeds = new();
 string[] seedsText = input[0].Substring(7).Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
 for(int i = 0; i * 2 <= seedsText.Length; i += 2)
 {
     Int64 startingSeed = Int64.Parse(seedsText[i]);
     Int64 count = Int64.Parse(seedsText[i + 1]);
-    seeds.Add(new SeedRange { InitialValue = startingSeed, Count = count});
+    seeds.Add(new NumberRange { InitialValue = startingSeed, Count = count});
 }
 
 //Read Maps
@@ -65,7 +65,7 @@ for (Int64 i = 1; i < input.Length; i++)
 //Find min location
 Int64 minLocation = Int64.MaxValue;
 
-foreach (SeedRange seedRange in seeds)
+foreach (NumberRange seedRange in seeds)
 {
     Int64 location = MinLocationViaMaps(seedRange);
     if (location < minLocation)
@@ -89,7 +89,7 @@ void AddToMap(string line, string currentMap)
     Int64 initialValue = Int64.Parse(data[1]);
     Int64 count = Int64.Parse(data[2])-1;
 
-    selectedMap.mapRanges.Add(new MapRange { InitialValue = initialValue, MappedTo = mappedTo, Count = count });
+    selectedMap.SubMaps.Add(new MapRange { InitialValue = initialValue, MappedTo = mappedTo, Count = count });
 }
 
 AlmanacMap SelectMap(string currentMap) => currentMap switch
@@ -104,9 +104,9 @@ AlmanacMap SelectMap(string currentMap) => currentMap switch
     _ => throw new ArgumentOutOfRangeException(nameof(currentMap), $"Not an known map: {currentMap}")
 };
 
-Int64 MinLocationViaMaps(SeedRange seedRange)
+Int64 MinLocationViaMaps(NumberRange seedRange)
 {
-    List<SeedRange> seeds = new List<SeedRange>
+    List<NumberRange> seeds = new List<NumberRange>
     {
         seedRange
     };
@@ -123,35 +123,36 @@ Int64 MinLocationViaMaps(SeedRange seedRange)
 #region Classes
 class AlmanacMap
 {
-    public List<MapRange> mapRanges = new();
+    public List<MapRange> SubMaps = new();
 
-    public List<SeedRange> NavigateRanges(List<SeedRange> seeds)
+    public List<NumberRange> NavigateRanges(List<NumberRange> ranges)
     {
-        List<SeedRange> mappedSeeds = new();
-        foreach(SeedRange seed in seeds)
+        List<NumberRange> resultingNumberRanges = new();
+
+        foreach(NumberRange range in ranges)
         {
-            List<SeedRange> mapRangeSeeds = mapRanges.SelectMany(x => x.NavigateRange(seed)).ToList();
+            List<NumberRange> mappedRange = SubMaps.SelectMany(x => x.NavigateRange(range)).ToList();
 
-            //Adding missing seed ranges
-            Int64 SStart = seed.InitialValue;
-            foreach (SeedRange seedRange in mapRangeSeeds.OrderBy(x => x.InitialValue).ToList())
+            //Adding missing ranges
+            Int64 StartingValue = range.InitialValue;
+            foreach (NumberRange numberRange in mappedRange.OrderBy(x => x.InitialValue).ToList())
             {
-                if (SStart != seedRange.InitialValue)
+                if (StartingValue != numberRange.InitialValue)
                 {
-                    mapRangeSeeds.Add(new SeedRange { InitialValue = SStart, Count = seedRange.InitialValue - SStart -1 });
+                    mappedRange.Add(new NumberRange { InitialValue = StartingValue, Count = numberRange.InitialValue - StartingValue -1 });
                 }
-                SStart = seedRange.MaxValue + 1;
+                StartingValue = numberRange.MaxValue + 1;
             }
-            if (SStart < seed.MaxValue)
+            if (StartingValue < range.MaxValue)
             {
-                mapRangeSeeds.Add(new SeedRange { InitialValue = SStart, Count = seed.MaxValue - SStart });
+                mappedRange.Add(new NumberRange { InitialValue = StartingValue, Count = range.MaxValue - StartingValue });
             }
 
-            mappedSeeds.AddRange(mapRangeSeeds);
+            resultingNumberRanges.AddRange(mappedRange);
         }
 
-        mappedSeeds.ForEach(x => x.ApplyOffset());
-        return mappedSeeds;
+        resultingNumberRanges.ForEach(x => x.ApplyOffset());
+        return resultingNumberRanges;
     }
 }
 
@@ -162,18 +163,18 @@ class MapRange
     public Int64 Count;
     public Int64 MaxValue => InitialValue + Count;
     public Int64 OffSet => MappedTo - InitialValue;
-    public List<SeedRange> NavigateRange(SeedRange seed)
+    public List<NumberRange> NavigateRange(NumberRange range)
     { 
-        List<SeedRange> mappedSeeds = new();
+        List<NumberRange> mappedRanges = new();
  
-        if (Between(seed.InitialValue, this.InitialValue,this.MaxValue) || Between(seed.MaxValue, this.InitialValue, this.MaxValue) || Between(this.InitialValue, seed.InitialValue, seed.MaxValue))
+        if (Between(range.InitialValue, this.InitialValue,this.MaxValue) || Between(range.MaxValue, this.InitialValue, this.MaxValue) || Between(this.InitialValue, range.InitialValue, range.MaxValue))
         {
-            Int64 newStartingKey = Math.Max(seed.InitialValue,InitialValue);
-            Int64 newCount = Math.Min(seed.MaxValue,this.MaxValue) - newStartingKey;
-            mappedSeeds.Add(new SeedRange { InitialValue = newStartingKey, Count = newCount, OffSet = this.OffSet });
+            Int64 newInitialValue = Math.Max(range.InitialValue,InitialValue);
+            Int64 newCount = Math.Min(range.MaxValue,this.MaxValue) - newInitialValue;
+            mappedRanges.Add(new NumberRange { InitialValue = newInitialValue, Count = newCount, OffSet = this.OffSet });
         }
 
-        return mappedSeeds;
+        return mappedRanges;
     }
 
     private bool Between(long startingSeed, long startingKey, long maxKey)
@@ -182,7 +183,7 @@ class MapRange
     }
 }
 
-class SeedRange
+class NumberRange
 {
     public Int64 InitialValue;
     public Int64 Count;
