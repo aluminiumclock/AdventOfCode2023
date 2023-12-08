@@ -24,25 +24,50 @@ foreach (string line in input.Skip(2))
 
 
 var ANodes = nodes.Where(x => x.Key[2] == 'A').Select(x => x.Key);
-bool AllZNodes = false;
-int steps = 0;
+List<int> cycles = new List<int>();
 
-while (!AllZNodes)
+
+foreach(var ANode in ANodes)
 {
-    char instruction = instructions[steps % instructions.Length];
-    ANodes = ANodes.Select(x => nodes[x].Next(instruction));
-    AllZNodes = !ANodes.Where(x => x[2] != 'Z').Any();
-    steps++;
-    if(steps % 10000 == 0)
+    int steps = 0;
+    string nextNode = ANode;
+
+    do
     {
-        Console.WriteLine(steps);
+        char instruction = instructions[steps % instructions.Length];
+        nextNode = instruction == 'R' ? nodes[nextNode].Right : nodes[nextNode].Left;
+        steps++;
     }
+    while (!(nextNode[2] == 'Z'));
+    
+    cycles.Add(steps);
 }
 
 
+long result = LowestCommonMultiple(cycles);
 
-Console.WriteLine(steps);
+Console.WriteLine(result);
 Console.ReadLine();
+
+
+long LowestCommonMultiple(List<int> cycles)
+{
+    return cycles.Select(x => (long)x).Aggregate((x, y) => ((x * y) / GreatestCommonDivisor(x, y)));
+}
+
+//credit for this method goes to https://stackoverflow.com/questions/18541832/c-sharp-find-the-greatest-common-divisor
+long GreatestCommonDivisor(long x, long y)
+{
+    while (x != 0 && y != 0)
+    {
+        if (x > y)
+            x %= y;
+        else
+            y %= x;
+    }
+
+    return x | y;
+}
 
 class Node
 {
