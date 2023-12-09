@@ -3,15 +3,78 @@
 #if DEBUG
     inputFile = "test.txt";
 #else
-    inputFile = "input.txt";
+inputFile = "input.txt";
 #endif
 
 int result = 0;
 string[] input = File.ReadAllLines(inputFile);
-foreach (string line in input)
+List<MapValue> map = new List<MapValue>();
+
+foreach (string inputLine in input)
 {
-    Console.WriteLine(line);
+    List<int> history = inputLine.Split(" ").Select(int.Parse).ToList();
+    map.Add(new MapValue(history));
 }
+
+
+result = map.Sum(x => x.PriorValue());
 
 Console.WriteLine(result);
 Console.ReadLine();
+
+
+class MapValue
+{
+    public List<int> History;
+
+    public MapValue(List<int> history)
+    {
+        History = history;
+    }
+
+    public int NextValue()
+    {
+        var levels = new List<List<int>>();
+
+        var differences = History.Zip(History.Skip(1), (x, y) => y - x).ToList();
+
+        while (differences.Where(x => x != 0).Any())
+        {
+            levels.Add(differences);
+            differences = differences.Zip(differences.Skip(1), (x, y) => y - x).ToList();
+        }
+
+        levels.Reverse();
+        int prevValue = 0;
+        foreach (var level in levels)
+        {
+            prevValue += level[^1];
+        }
+        int total = prevValue + History.Last();
+
+        return total;
+    }
+
+    public int PriorValue()
+    {
+        var levels = new List<List<int>>();
+
+        var differences = History.Zip(History.Skip(1), (x, y) => y - x).ToList();
+
+        while (differences.Where(x => x != 0).Any())
+        {
+            levels.Add(differences);
+            differences = differences.Zip(differences.Skip(1), (x, y) => y - x).ToList();
+        }
+
+        levels.Reverse();
+        int prevValue = 0;
+        foreach (var level in levels)
+        {
+            prevValue = level[0] - prevValue;
+        }
+        int total = History.First() - prevValue;
+
+        return total;
+    }
+}
