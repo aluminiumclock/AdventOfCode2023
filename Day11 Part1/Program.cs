@@ -20,7 +20,7 @@ for (int x = 0 ; x < width; x++)
 {
     for(int y = 0 ; y < height; y++)
     {
-        if (input[x][y] == '#')
+        if (input[y][x] == '#')
         {
             StarChart.Add(new StarChartPoint(x, y, GalaxyNo, true));
             GalaxyNo++;
