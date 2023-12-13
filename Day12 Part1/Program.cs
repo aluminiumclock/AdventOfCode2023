@@ -10,15 +10,20 @@ string inputFile;
     inputFile = "input.txt";
 #endif
 
-List<SpringRow> rows = File.ReadAllLines(inputFile).Select(x => x.Split(' ')).Select(y => new SpringRow(y[0], y[1])).Take(1).ToList();
+List<SpringRow> rows = File.ReadAllLines(inputFile).Select(x => x.Split(' ')).Select(y => new SpringRow(y[0], y[1])).Skip(6).ToList();
 
 int result = 0;
 Dictionary<(string, int[]), int> PermutationCache = new();
 int counter = 0;
+int rowTotal = 0;
+int row = 1;
 
 foreach(var springRow in rows)
 {
-    result += Permutations(springRow.line, springRow.brokenSpring);
+    rowTotal += Permutations(springRow.line, springRow.brokenSpring);
+    result += rowTotal;
+    Console.WriteLine($"Row: {row++} has {rowTotal} permutations \n");
+    rowTotal = 0;
 }
 
 Console.WriteLine(counter);
@@ -27,7 +32,7 @@ Console.ReadLine();
 
 int Permutations(string line, int[] brokenSprings)
 {
-    //check if we've already done this lookup
+    //check if we've already done this lookup and use the value if we have
     if(PermutationCache.TryGetValue((line, brokenSprings), out var value))
     {
         return value;
@@ -45,14 +50,16 @@ int Permutations(string line, int[] brokenSprings)
     {
         return Permutations(line[1..], brokenSprings);
     } 
+
     //choose to go with current number or skip
     int current = (line.Substring(0, brokenSprings[0]).All(x => x != '.') 
                         && line.Length > brokenSprings[0] 
-                        && line.Substring(brokenSprings[0])[0] != '#'
-                    || line.Length <= brokenSprings[0]) ?
-        Permutations(line[brokenSprings[0]..], brokenSprings[1..])
-        : 0;
+                        && line.Substring(brokenSprings[0])[0] != '#') 
+                   ?
+            Permutations(line[(brokenSprings[0] + 1)..], brokenSprings[1..]) 
+            : 0;
 
+    current = line.Length <= brokenSprings[0] && line.All(x => x == '#' || x == '?') ? 1 : current;
 
     int skipped = line[0] == '?' ? Permutations(line[1..], brokenSprings) : 0;
 
@@ -60,6 +67,10 @@ int Permutations(string line, int[] brokenSprings)
     PermutationCache.Add((line, brokenSprings), result);
 
     counter++;
+    //if (result > 0)
+    //{
+        Console.WriteLine(line + ", " + brokenSprings.Length + ":" + brokenSprings[0] + " Result:" + result);
+    //}
     return result;
 }
 
