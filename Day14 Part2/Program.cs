@@ -22,48 +22,54 @@ for (int x = 0; x < width; x++)
     }
 }
 
+
 Dictionary<string, int> seenPlatforms = new();
-int maxCycle = 0;
-const int CYCLE_COUNT = 1000000000;//1000000000
+Dictionary<int, int> scores = new();
 
-//var Origcolumn = Enumerable.Range(0, width)
-//                .Select(x => platform[0, x])
-//                .ToArray();
+int period = 0;
+int start = 0;
+int CYCLE_COUNT = 1000000000;
 
+//Add Initial state too dictionary
+seenPlatforms.Add(PlatformAsString(platform), 0);
+scores.Add(0, scorePlatform(platform));
+Console.WriteLine("0:" + scorePlatform(platform));
 
-//var pColumns = getColumns(platform);
-//var column = Enumerable.Range(0, width)
-//                .Select(x => platform[7, x])
-//                .ToArray();
-
-platform = moveBoulders(platform);
-seenPlatforms.Add(PlatformAsString(platform), scorePlatform(platform));
-
-for (int cycles = 1; cycles <= 30; cycles++)
+for (int cycles = 1; cycles <= CYCLE_COUNT; cycles++)
 {
-    for (int count = 0; count < 4; count++)
-    {
-        platform = rotatePlatformNegative90Degress(platform);
-        platform = moveBoulders(platform);
-    }
-    maxCycle = cycles;
 
-    //string PlatformString = PlatformAsString(platform);
-    //if (seenPlatforms.ContainsKey(PlatformString)) { break; }
-    //seenPlatforms.Add(PlatformString, scorePlatform(platform));
-    Console.WriteLine(scorePlatform(platform));
+    platform = runCycle(platform);
+
+    string PlatformString = PlatformAsString(platform);
+    if (seenPlatforms.ContainsKey(PlatformString))
+    {
+        start = seenPlatforms[PlatformString];
+        period = cycles - start;
+        break;
+    }
+    seenPlatforms.Add(PlatformString, cycles);
+    scores.Add(cycles, scorePlatform(platform));
+    Console.WriteLine($"{cycles}: {scorePlatform(platform)}");
 }
 
-Console.WriteLine("Score for All Loads So Far");
-int AboveEnd = CYCLE_COUNT % (maxCycle - 1);
-Console.WriteLine($"Cycle count: {AboveEnd}");
 
+int finalPlatform = start + (CYCLE_COUNT - start) % period;
+int result = scores[finalPlatform];
 
-int result = scorePlatform(platform);
-
-Console.WriteLine(maxCycle);
 Console.WriteLine(result);
 Console.ReadLine();
+
+char[,] runCycle(char[,] platform)
+{
+    char[,] newPlatform = moveBoulders(platform);
+    for (int count = 0; count < 3; count++)
+    {
+        newPlatform = rotatePlatform90Degress(newPlatform);
+        newPlatform = moveBoulders(newPlatform);
+    }
+    newPlatform = rotatePlatform90Degress(newPlatform);
+    return newPlatform;
+}
 
 char[,] moveBoulders(char[,] platform)
 {
@@ -87,7 +93,7 @@ char[,] moveBoulders(char[,] platform)
 }
 
 
-char[,] rotatePlatformNegative90Degress(char[,] platform)
+char[,] rotatePlatform90Degress(char[,] platform)
 {
     int width = platform.GetLength(1);
     int height = platform.GetLength(0);
@@ -99,6 +105,24 @@ char[,] rotatePlatformNegative90Degress(char[,] platform)
         for (int j = 0; j < height; j++)
         {
             newPlatform[height - 1 - j , i] = platform[i, j];
+        }
+    }
+
+    return newPlatform;
+}
+
+char[,] rotatePlatformNegative90Degress(char[,] platform)
+{
+    int width = platform.GetLength(1);
+    int height = platform.GetLength(0);
+    if (width > height) { throw new ArgumentException(); }
+
+    char[,] newPlatform = new char[width, height];
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            newPlatform[j, height - 1 - i] = platform[i, j];
         }
     }
 
@@ -140,32 +164,36 @@ List<char[]> getColumns(char[,] platform)
     return Columns;
 }
 
+static void PrintPlatform(char[,] platform)
+{
+    int width = platform.GetLength(0);
+    int height = platform.GetLength(1);
+
+    StringBuilder sb = new StringBuilder();
+    for (int j = 0; j < width; j++) 
+    {
+        for (int i = 0; i < height; i++)
+        {
+            sb.Append(platform[i, j]);
+        }
+        sb.AppendLine();
+    }
+    sb.AppendLine();
+    Console.WriteLine(sb.ToString());
+}
+
 static string PlatformAsString(char[,] platform)
 {
     int width = platform.GetLength(0);
     int height = platform.GetLength(1);
 
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < height; i++)
+    for (int j = 0; j < width; j++) 
     {
-        for (int j = 0; j < width; j++)
+        for (int i = 0; i < height; i++)
         {
             sb.Append(platform[i, j]);
         }
     }
     return sb.ToString();
 }
-
-
-Dictionary<string, int> chars = new();
-
-//put array in a dictionary
-char[,] data1 = new char[,] { { 'a', 'b' }, { 'c', 'd' }, { 'e', 'f' }, { 'g', 'h' } };
-char[,] data2 = new char[,] { { 'a', 'b' }, { 'c', 'd' }, { 'e', 'f' }, { 'g', 'h' } };
-
-
-chars.Add(new String(data1.Cast<char>().ToArray()), 1);
-//chars.Add(new String(data2.Cast<char>().ToArray()), 2);
-
-int total = chars.Count();
-
