@@ -13,27 +13,39 @@ string inputFile;
 List<SpringRow> rows = File.ReadAllLines(inputFile).Select(x => x.Split(' ')).Select(y => new SpringRow(y[0], y[1])).Skip(6).ToList();
 
 int result = 0;
-Dictionary<(string, int[]), int> PermutationCache = new();
+Dictionary<(string, string), int> PermutationCache = new();
+
+//Pre-Populate dictionary with some obvious answers
+//for (int i = 0; i < 10; i++)
+//{
+//    string line = new string('#', i);
+//    PermutationCache.Add((line, i.ToString()), 1);
+//    PermutationCache.Add((line + '.', i.ToString()), 1);
+//    PermutationCache.Add((line + "..", i.ToString()), 1);
+//    PermutationCache.Add((line + '?', i.ToString()), 2);
+//}
+
 int counter = 0;
 int rowTotal = 0;
 int row = 1;
 
 foreach(var springRow in rows)
 {
+    Console.WriteLine("Start:" + springRow.line + ", " + springRow.brokenSpring.Length + ":" + springRow.brokenSpring[0] );
     rowTotal += Permutations(springRow.line, springRow.brokenSpring);
     result += rowTotal;
     Console.WriteLine($"Row: {row++} has {rowTotal} permutations \n");
     rowTotal = 0;
 }
 
-Console.WriteLine(counter);
+Console.WriteLine("Permutations ran to end " + counter + " times.");
 Console.WriteLine(result);
-Console.ReadLine();
+//Console.ReadLine();
 
 int Permutations(string line, int[] brokenSprings)
 {
     //check if we've already done this lookup and use the value if we have
-    if(PermutationCache.TryGetValue((line, brokenSprings), out var value))
+    if(PermutationCache.TryGetValue((line, string.Join(",",brokenSprings)), out var value))
     {
         return value;
     }
@@ -64,7 +76,7 @@ int Permutations(string line, int[] brokenSprings)
     int skipped = line[0] == '?' ? Permutations(line[1..], brokenSprings) : 0;
 
     int result = current + skipped;
-    PermutationCache.Add((line, brokenSprings), result);
+    PermutationCache.Add((line, string.Join(",", brokenSprings)), result);
 
     counter++;
     //if (result > 0)
