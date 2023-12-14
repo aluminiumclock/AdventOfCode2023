@@ -22,7 +22,7 @@ for (int x = 0; x < width; x++)
     }
 }
 
-
+//Create variables for cycle
 Dictionary<string, int> seenPlatforms = new();
 Dictionary<int, int> scores = new();
 
@@ -52,7 +52,7 @@ for (int cycles = 1; cycles <= CYCLE_COUNT; cycles++)
     Console.WriteLine($"{cycles}: {scorePlatform(platform)}");
 }
 
-
+//calculate witch is the last platform
 int finalPlatform = start + (CYCLE_COUNT - start) % period;
 int result = scores[finalPlatform];
 
@@ -110,25 +110,6 @@ char[,] rotatePlatform90Degress(char[,] platform)
 
     return newPlatform;
 }
-
-char[,] rotatePlatformNegative90Degress(char[,] platform)
-{
-    int width = platform.GetLength(1);
-    int height = platform.GetLength(0);
-    if (width > height) { throw new ArgumentException(); }
-
-    char[,] newPlatform = new char[width, height];
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < height; j++)
-        {
-            newPlatform[j, height - 1 - i] = platform[i, j];
-        }
-    }
-
-    return newPlatform;
-}
-
 int scorePlatform(char[,] platform)
 {
     int width = platform.GetLength(1);
@@ -145,23 +126,6 @@ int scorePlatform(char[,] platform)
         }
     }
     return score;
-}
-
-List<char[]> getColumns(char[,] platform)
-{
-    List<char[]> Columns = new();
-    int width = platform.GetLength(0);
-    int height = platform.GetLength(1);
-
-    for (int row = 0; row < height; row++)
-    {
-        var column = Enumerable.Range(0, width)
-                        .Select(x => platform[row, x])
-                        .ToArray();
-        Columns.Add(column);
-    }
-
-    return Columns;
 }
 
 static void PrintPlatform(char[,] platform)
