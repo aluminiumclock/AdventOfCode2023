@@ -10,6 +10,10 @@ namespace AOC_Helper
         public static readonly Coordinates Left = new(0, -1);
         public static readonly Coordinates Right = new(0, 1);
         public static readonly Coordinates Zero = new(0, 0);
+        public static readonly List<Coordinates> CardinalDirections =
+        [
+            Up, Down, Left, Right
+        ];
 
         public Coordinates(long x, long y)
         {
