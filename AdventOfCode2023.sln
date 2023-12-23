@@ -103,6 +103,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day25 Part1", "Day25 Part1\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day25 Part2", "Day25 Part2\Day25 Part2.csproj", "{D6C68146-4F52-46D0-A625-0A7E0CF19A52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AOC Helper", "AOC Helper\AOC Helper.csproj", "{F1356355-2BCB-45EF-83F6-5549D431CCDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -309,6 +311,10 @@ Global
 		{D6C68146-4F52-46D0-A625-0A7E0CF19A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6C68146-4F52-46D0-A625-0A7E0CF19A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6C68146-4F52-46D0-A625-0A7E0CF19A52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1356355-2BCB-45EF-83F6-5549D431CCDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1356355-2BCB-45EF-83F6-5549D431CCDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1356355-2BCB-45EF-83F6-5549D431CCDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1356355-2BCB-45EF-83F6-5549D431CCDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
